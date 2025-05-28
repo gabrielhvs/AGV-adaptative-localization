@@ -1,9 +1,6 @@
 [submodule "ws/src/operation/teleop_twist_keyboard"]
 	path = ws/src/operation/teleop_twist_keyboard
 	url = https://github.com/ros-teleop/teleop_twist_keyboard
-[submodule "ws/src/line_follower"]
-	path = ws/src/line_follower
-	url = https://github.com/jonmartinezdeaguirre/turtlebot3_line_follower
 [submodule "ws/src/particle_filter/navigation"]
 	path = ws/src/particle_filter/navigation
 	url = https://github.com/ros-planning/navigation
