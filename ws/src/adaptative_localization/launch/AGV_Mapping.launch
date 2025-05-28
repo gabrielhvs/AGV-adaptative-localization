@@ -1,0 +1,40 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg name="rec" default="false"/>
+    <arg name="x" default="0.025"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="0"/>  
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="1.570796"/>
+    <arg name="world_path" default="worlds/empty.world"/>
+	<arg name="robot_name" default="/AGV"/>
+
+    <!-- Start Gmapping node -->
+    <node name="gmapping" pkg="gmapping" type="slam_gmapping">
+        <param name="base_frame" value="base_link"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="scan_frame" value="scan_link"/>
+        <remap from="scan" to="laser"/>
+    </node>
+
+    <!-- Simulation world and node -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
+        <arg name = "world_name" value =  "$(find agv_simulation)/worlds/map_depo.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'" />	
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description" if="$(arg sim)">
+    </node>
+
+</launch>
