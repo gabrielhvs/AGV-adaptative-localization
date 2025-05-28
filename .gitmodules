@@ -16,3 +16,6 @@
 [submodule "ws/src/mapping/slam_gmapping"]
 	path = ws/src/mapping/slam_gmapping
 	url = https://github.com/ros-perception/slam_gmapping
+[submodule "ws/src/sensor_fusion/robot_localization"]
+	path = ws/src/sensor_fusion/robot_localization
+	url = https://github.com/cra-ros-pkg/robot_localization
