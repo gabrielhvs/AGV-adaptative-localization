@@ -7,3 +7,12 @@
 [submodule "ws/src/particle_filter/navigation"]
 	path = ws/src/particle_filter/navigation
 	url = https://github.com/ros-planning/navigation
+[submodule "ws/src/mapping/openslam_gmapping"]
+	path = ws/src/mapping/openslam_gmapping
+	url = https://github.com/ros-perception/openslam_gmapping
+[submodule "ws/src/mapping/ros_autonomous_slam"]
+	path = ws/src/mapping/ros_autonomous_slam
+	url = https://github.com/fazildgr8/ros_autonomous_slam
+[submodule "ws/src/mapping/slam_gmapping"]
+	path = ws/src/mapping/slam_gmapping
+	url = https://github.com/ros-perception/slam_gmapping
