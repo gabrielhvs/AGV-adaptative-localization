@@ -56,6 +56,9 @@
         <param name="initial_pose_a" value="$(arg yaw)"/>
     </node>
 
+
+  <include file="$(find adaptative_localization)/launch/ekf_localization.launch"/>
+
       <!-- Move base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(find adaptative_localization)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
@@ -65,7 +68,7 @@
    <rosparam file="$(find adaptative_localization)/config/base_local_planner_params.yaml" command="load" />
     
     <remap from="cmd_vel" to="cmd_vel"/>
-    <remap from="odom" to="odom"/>
+    <remap from="odom" to="odometry/filtered"/>
     <remap from="scan" to="laser"/>
     <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
     <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>      
