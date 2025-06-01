@@ -202,6 +202,29 @@ roslaunch adaptative_localization AGV_moving.launch
 This launch file started gazebo and rviz, in the rviz you can apply a goal and
 the package  generate a path until a goal. The robot will be control to follow a path.
 
+#### Sensor Fusion (EKF)
+
+To test sensor fusion using the `robot_localization` package, you can run the following launch file:
+
+```
+roslaunch adaptative_localization ekf_localization.launch
+```
+This launch file starts:
+
+The AGV robot in the standard simulation environment (map_depo.world)
+
+The EKF filter from the robot_localization package
+
+RViz with a configuration for real-time observation
+
+Publication of filtered odometry to the topic /odometry/filtered
+
+Notes:
+The reference frame used is base_link.
+
+The EKF configuration file is located at:
+ws/src/adaptative_localization/config/ekf.yaml
+
 #### More detais about packages
 
 Package | Documentation
