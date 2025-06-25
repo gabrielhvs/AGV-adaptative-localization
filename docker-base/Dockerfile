@@ -40,7 +40,8 @@ RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 RUN groupadd -r user && useradd --create-home --gid user user && echo 'user ALL=NOPASSWD: ALL' > /etc/sudoers.d/user
 
 RUN sudo apt update && apt-get install -y ros-noetic-ros-control ros-noetic-ros-controllers ros-noetic-ackermann-msgs \
-ros-noetic-teb-local-planner ros-noetic-dwa-local-planner 
+ros-noetic-teb-local-planner ros-noetic-dwa-local-planner libsdl-image1.2-dev libsdl-dev \
+ros-noetic-tf2-sensor-msgs ros-noetic-move-base-msgs
 
 USER user
 WORKDIR /home/user

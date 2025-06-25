@@ -15,5 +15,6 @@ build
 devel
 logs
 *.log
+*.bag
 
 OTA-v0.7.stl

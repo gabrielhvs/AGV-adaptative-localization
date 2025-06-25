@@ -1,0 +1,47 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg name="rec" default="false"/>
+    <arg name="x" default="-4.212016"/>
+    <arg name="y" default="-4.044066"/>
+    <arg name="z" default="0"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="1.576397"/>
+    <arg name="world_path" default="$(find adaptative_localization)/worlds/lineWall.world"/>
+	<arg name="robot_name" default="/AGV"/>
+
+    <node pkg="tf" type="static_transform_publisher" name="odom_to_map"
+    args="0.0 0 0.0 0 0 0  /odom /map 100" />
+    <node pkg="tf" type="static_transform_publisher" name="map_to_base_link"
+    args="0.0 0 0.0 0 0 0  /map /base_link " />
+
+    <!-- Line follower node -->
+    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>
+
+    <!-- Simulation world and node -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
+        <arg name = "world_name" value =  "$(arg world_path)"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+        <arg name="extra_gazebo_args" value="--lockstep"/>
+    </include>
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="publish_frequency" value="500"/>
+        <param name="use_tf_static"     value="true"/>
+         <param name="ignore_timestamp"     value="true"/>
+    </node>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+        <param name="rate" value="500"/>
+    </node>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description" if="$(arg sim)">
+    </node>
+
+</launch>

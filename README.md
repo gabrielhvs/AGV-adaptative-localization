@@ -224,7 +224,7 @@ robot_localization |[README.md](ws/src/sensor_fusion/robot_localization/README.m
 -->
 
 <a href="https://github.com/gabrielhvs/AGV-adaptative-localization/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=gabrielhvs/AGV-adaptative-localization" />
+  <img src="https://contrib.rocks/image?repo=gabrielhvs/AGV-adaptative-localization"/>
 </a>
 
 ## Feedback<!-- Required -->
