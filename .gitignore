@@ -15,5 +15,5 @@ build
 devel
 logs
 *.log
-
 OTA-v0.7.stl
+*_deps*
