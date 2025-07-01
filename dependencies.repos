@@ -1,0 +1,30 @@
+repositories:
+  teleop:
+    type: git
+    url: https://github.com/ros-teleop/teleop_twist_keyboard
+    version: master
+
+  nav:
+    type: git
+    url: https://github.com/ros-planning/navigation
+    version: noetic-devel
+
+  open_slam:
+    type: git
+    url: https://github.com/ros-perception/openslam_gmapping
+    version: melodic-devel
+
+  ros_autonomous:
+    type: git
+    url: https://github.com/fazildgr8/ros_autonomous_slam
+    version: master
+
+  slam_gmapping:
+    type: git
+    url: https://github.com/ros-perception/slam_gmapping
+    version: melodic-devel
+
+  robot_localization:
+    type: git
+    url: https://github.com/cra-ros-pkg/robot_localization
+    version: noetic-devel
