@@ -17,3 +17,4 @@ logs
 *.log
 OTA-v0.7.stl
 *_deps*
+*__pycache__*
