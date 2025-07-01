@@ -15,7 +15,7 @@ fi
 
 sufix=$1
 container=$2
-dir=$PWD/$container/
+dir=$PWD
 
 echo  $sufix
 echo  $dir
