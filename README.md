@@ -120,39 +120,39 @@ It's need install docker in your desktop follow this tutorial: [docker install](
 To using a docker image of this repository run this comand in terminal:
 
 ```
-./build.sh [folder of Dockerfile]
+./tools/build.sh [folder of Dockerfile]
 ```
 
 For this repository:
 ```
-./build.sh docker-base
+./tools/build.sh docker-base
 ```
 
 After this to using the image created run this:
 ```
-./open.sh [folder of Dockerfile] [work dir]
+./tools/open.sh [folder of Dockerfile] [work dir]
 ```
 
 For this repository:
 ```
-./open.sh docker-base ws
+./tools/open.sh docker-base ws
 ```
 
 When execute this command, a iteractive terminal is open. If you needs close this using:
 ```
-./stop.sh [work dir]
+./tools/stop.sh [work dir]
 ```
 
 For this repository:
 ```
-./stop.sh ws
+./tools/stop.sh ws
 ```
 
 ### Step 2 — Building Ros Packages
 
 Using the conteiner docker run this command to start building of packages ros:
 ```
-catkin build
+./tools/run_ws.sh
 ```
 
 Source the link ros in work dir:
@@ -182,7 +182,7 @@ Control robot in the world and mapping this environment.
 When finish the mapping in environment, to save a map using this comand:
 
 ```
-rosrun map_server map_saver -f ~ws/src/adaptative_localization/maps/mymap
+rosrun map_server map_saver -f ~src/adaptative_localization/maps/mymap
 ```
 #### Localization
 To localization AGV using this map you can run this command:
@@ -223,21 +223,16 @@ Notes:
 The reference frame used is base_link.
 
 The EKF configuration file is located at:
-ws/src/adaptative_localization/config/ekf.yaml
+src/adaptative_localization/config/ekf.yaml
 
 #### More detais about packages
 
 Package | Documentation
 --------|--------------
-agv     | [README.md](ws/src/agv/README.md)
-ros_autonomous_slam | [README.md](ws/src/mapping/ros_autonomous_slam/README.md)
-slam_gmapping       | [README.md](ws/src/mapping/slam_gmapping/README.md)
-teleop_twist_keyboard |[README.md](ws/src/operation/teleop_twist_keyboard/README.md)
-navigation          | [README.md](ws/src/particle_filter/navigation/README.md)
-robot_line_follower | [README.md](ws/src/robot_line_follower/README.md)
-robot_localization |[README.md](ws/src/sensor_fusion/robot_localization/README.md)
+agv     | [README.md](https://github.com/inomuh/agv/blob/v1.1/README.md)
+robot_line_follower | [README.md](https://github.com/jonmartinezdeaguirre/turtlebot3_line_follower)
 
-[Main package](ws/src/adaptative_localization)
+[Main package](src/adaptative_localization/)
 
 ## Contributors<!-- Required -->
 <!-- 
