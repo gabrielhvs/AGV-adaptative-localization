@@ -44,6 +44,8 @@ ros-noetic-teb-local-planner ros-noetic-dwa-local-planner libsdl-image1.2-dev li
 ros-noetic-tf2-sensor-msgs ros-noetic-move-base-msgs python3-vcstool \
 ros-noetic-geographic-msgs libgeographic-dev
 
+RUN sudo apt update && sudo apt-get -y --no-install-recommends install python3-tk && sudo pip install rdp
+
 
 USER user
 WORKDIR /home/user
