@@ -1,0 +1,26 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg name="world_path" default="$(find adaptative_localization)/world/line_fail_warehouse.world"/>
+    <param name="output" value="$(arg world_path)"/>
+
+    <rosparam file="$(find adaptative_localization)/param_worlds/line_fail_warehouse.yaml" command="load"/>
+    <node name="generate_world" pkg="adaptative_localization" type="generate_world_offline" output="screen"/>
+
+    <!-- Atraso para garantir que o .world seja gerado -->
+    <param name="wait_duration" value="5" />
+    <node pkg="roscpp_tutorials" type="talker" name="delay_node" output="screen" launch-prefix="bash -c 'sleep 5; exec'">
+        <param name="dummy_param" value="true" />
+    </node>
+
+    <!--Simulation world and node -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
+        <arg name = "world_name" value =  "$(arg world_path)"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+        <arg name="extra_gazebo_args" value="--lockstep"/>
+    </include>
+
+</launch>
