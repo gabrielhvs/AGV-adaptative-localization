@@ -1,0 +1,29 @@
+<launch>
+    <!-- Carrega o mapa -->
+    <arg name="map_file" default="$(find adaptative_localization)/maps/mymap.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+
+    <!-- AMCL funcionando -->
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+        <remap from="scan" to="laser"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="base_frame_id" value="base_link"/>
+        <param name="global_frame_id" value="map"/>
+    </node>
+
+    <!-- Mundo e Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find agv_simulation)/worlds/map_depo.world"/>
+    </include>
+
+    <!-- Robô -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+          args="-urdf -model autorace -param robot_description"/>
+
+    <!-- RViz -->
+    <node pkg="rviz" type="rviz" name="rviz"/>
+</launch>

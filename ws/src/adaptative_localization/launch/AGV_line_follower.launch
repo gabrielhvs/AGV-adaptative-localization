@@ -1,0 +1,57 @@
+<launch>
+    <!-- Argumentos de posição -->
+    <arg name="x" default="0.025"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="0"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="1.570796"/>
+
+    <!-- Caminho do mapa -->
+    <arg name="map_file" default="$(find adaptative_localization)/maps/mymap.yaml"/>
+
+    <!-- Carregar o mapa -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+        <param name="frame_id" value="map"/>
+    </node>
+
+    <!-- AMCL para localização -->
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+        <!-- Verifica seu tópico correto do laser -->
+        <remap from="scan" to="scan"/>  
+        <param name="odom_model_type" value="diff"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="base_frame_id" value="base_link"/>
+        <param name="global_frame_id" value="map"/>
+        <param name="transform_tolerance" value="0.5"/>
+        <param name="resample_interval" value="1"/>
+        <param name="min_particles" value="500"/>
+        <param name="max_particles" value="5000"/>
+    </node>
+
+    <!-- Mundo e Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find agv_simulation)/worlds/map_depo.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+    </include>
+
+    <!-- Publicar URDF -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+    <!-- Spawn do robô -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description"/>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find adaptative_localization)/rviz_config/amcl_config.rviz"/>
+
+    <!-- Seguidor de linha virtual -->
+    <node name="virtual_line_follower" pkg="virtual_line_follower" type="virtual_line_follower.py" output="screen"
+        args="_line_path:=$(find virtual_line_follower)/config/virtual_line.yaml"/>
+</launch>
