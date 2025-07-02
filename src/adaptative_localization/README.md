@@ -33,8 +33,8 @@ Run this comand:
 Click in image of worlds default and get a file
 
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  <a href="src/adaptative_localization/world/maze_warehouse.world"><img src="../../image/world_1.png" width="200"></a>
-  <a href="src/adaptative_localization/world/square_warehouse.world"><img src="../../image/world_2.png" width="200"/>
-  <a href="src/adaptative_localization/world/line_comp_warehouse.world"><img src="../../image/world_3.png" width="200"/>
-  <a href="src/adaptative_localization/world/line_fail_warehouse.world"><img src="../../image/world_4.png" width="200"/>
+  <a href="world/maze_warehouse.world"><img src="../../image/world_1.png" width="200"></a>
+  <a href="world/square_warehouse.world"><img src="../../image/world_2.png" width="200"/>
+  <a href="world/line_comp_warehouse.world"><img src="../../image/world_3.png" width="200"/>
+  <a href="world/line_fail_warehouse.world"><img src="../../image/world_4.png" width="200"/>
 </div>
