@@ -18,3 +18,4 @@ logs
 OTA-v0.7.stl
 *_deps*
 *__pycache__*
+*.bag
