@@ -232,8 +232,7 @@ Package | Documentation
 agv     | [README.md](https://github.com/inomuh/agv/blob/v1.1/README.md)
 robot_line_follower | [README.md](https://github.com/jonmartinezdeaguirre/turtlebot3_line_follower)
 gen_virtual_line | [README.md](src/gen_virtual_line/README.md)
-
-[Main package](src/adaptative_localization/)
+adaptative_laclization | [README.md](src/adaptative_localization/README.md)
 
 ## Contributors<!-- Required -->
 <!-- 
