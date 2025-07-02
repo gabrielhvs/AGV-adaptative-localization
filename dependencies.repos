@@ -28,3 +28,8 @@ repositories:
     type: git
     url: https://github.com/cra-ros-pkg/robot_localization
     version: noetic-devel
+
+  aws_warehouse_world:
+    type: git
+    url: https://github.com/aws-robotics/aws-robomaker-small-warehouse-world
+    version: ros1
