@@ -32,5 +32,6 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_install_python(PROGRAMS
   src/filter_bag.py
   src/gen_virtual_line.py
+  src/publishing_waypoints.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
