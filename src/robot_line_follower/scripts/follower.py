@@ -33,7 +33,7 @@ class Follower:
 
     def camera_callback(self, msg):
         print("camera_callback(self, msg)")
-        direction = self.detector.get_direction(message=msg, line_color='red', tol=15)
+        direction = self.detector.get_direction(message=msg, line_color='yellow', tol=15)
         self.motion_planner.move(direction)
 
 if __name__ == '__main__':
