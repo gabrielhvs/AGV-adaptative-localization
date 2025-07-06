@@ -1,0 +1,92 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg name="rec" default="false"/>
+    <arg name="x" default="4.0"/><!--line_comp: 3--><!--maze: 1--><!--square: 4-->
+    <arg name="y" default="3.0"/><!--line_comp: 1--><!--maze: 16--><!--square: 3-->
+    <arg name="z" default="0"/>  
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
+    <arg name="world" default="square_warehouse"/>
+    <arg name="map_file" default="$(find adaptative_localization)/maps/$(arg world).yaml"/>
+
+    <!-- Mapping-->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+        <param name="frame_id" value="map"/>
+    </node>
+
+    <!-- Localization-->
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+        <remap from="scan" to="laser"/>
+        <param name="odom_model_type" value="diff"/>
+        <param name="odom_alpha5" value="0.1"/>
+        <param name="gui_publish_rate" value="10.0"/>
+        <param name="laser_max_beams" value="30"/>
+        <param name="min_particles" value="500"/>
+        <param name="max_particles" value="5000"/>
+        <param name="kld_err" value="0.05"/>
+        <param name="kld_z" value="0.99"/>
+        <param name="odom_alpha1" value="0.2"/>
+        <param name="odom_alpha2" value="0.2"/>
+        <param name="odom_alpha3" value="0.8"/>
+        <param name="odom_alpha4" value="0.2"/>
+        <param name="laser_z_hit" value="0.5"/>
+        <param name="laser_z_short" value="0.05"/>
+        <param name="laser_z_max" value="0.05"/>
+        <param name="laser_z_rand" value="0.5"/>
+        <param name="laser_sigma_hit" value="0.2"/>
+        <param name="laser_lambda_short" value="0.1"/>
+        <param name="laser_model_type" value="likelihood_field"/>
+        <param name="laser_likelihood_max_dist" value="2.0"/>
+        <param name="update_min_d" value="0.2"/>
+        <param name="update_min_a" value="0.5"/>
+        <param name="odom_frame_id" value="odom_amcl"/>
+        <param name="resample_interval" value="1"/>
+        <param name="transform_tolerance" value="0.1"/>
+        <param name="recovery_alpha_slow" value="0.0"/>
+        <param name="recovery_alpha_fast" value="0.0"/>
+        <param name="initial_pose_x" value="$(arg x)"/>
+        <param name="initial_pose_y" value="$(arg y)"/>
+        <param name="initial_pose_a" value="$(arg yaw)"/>
+    </node>
+
+    <!-- Publish Waypoints -->
+    <node name="publish_waypoints" pkg="gen_virtual_line" type="publishing_waypoints.py" output="screen"
+            args=" $(find gen_virtual_line)/src/data_result/$(arg world)_data_filter_result.csv" />
+
+    <!-- Simulation world and node -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
+        <arg name = "world_name" value =  "$(find adaptative_localization)/world/$(arg world).world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="false"/> <!--  <arg name="gui" value="true"/> to open gazebo -->
+        <arg name="headless" value="true"/> <!--  <arg name="headless" value="false"/> to open gazebo -->
+        <arg name="debug" value="false"/>
+    </include>
+
+    <!-- Publish Model -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="publish_frequency" value="50"/>
+        <param name="use_tf_static"     value="true"/>
+        <param name="publish_frequency" value="50"/>
+    </node>
+
+    <!-- Publish Join States -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+    <!-- Apply Model in Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description" if="$(arg sim)">
+    </node>
+
+    <!-- Publish  TF-->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0 0.0 0 0 0  /map /odom 100" />
+
+    <!-- Rviz -->
+    <node type="rviz" name="rviz" pkg="rviz" required="true" args="-d $(find adaptative_localization)/rviz_config/view_config.rviz"/>
+
+    <!-- Line follower node 
+    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>-->
+
+</launch>
