@@ -146,9 +146,5 @@
     <model name='aws_robomaker_warehouse_DeskC_01_19'>    <pose>13 8 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_DeskC_01</uri>     </include>  </model>
     <model name='aws_robomaker_warehouse_DeskC_01_20'>    <pose>13 10 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_DeskC_01</uri>     </include>  </model>
     <model name='aws_robomaker_warehouse_ClutteringA_01_21'>    <pose>14 3 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_ClutteringA_01</uri>     </include>  </model>
-    <model name='aws_robomaker_warehouse_TrashCanC_01_22'>    <pose>18 5 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>     </include>  </model>
-    <model name='aws_robomaker_warehouse_TrashCanC_01_23'>    <pose>18 7 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>     </include>  </model>
-    <model name='aws_robomaker_warehouse_TrashCanC_01_24'>    <pose>18 9 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>     </include>  </model>
-    <model name='aws_robomaker_warehouse_TrashCanC_01_25'>    <pose>18 11 0.01 0 0 0</pose>     <include>        <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>     </include>  </model>
-  </world>
+    </world>
 </sdf>
