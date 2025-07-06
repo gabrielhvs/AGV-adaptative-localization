@@ -1,2 +1,2 @@
 #!/bin/bash
-docker container stop ubuntu2004-ros-noetic-container-$1
+docker container stop pipeline-ros-noetic-ubuntu-20-02-ws

@@ -13,26 +13,18 @@ then
     chmod a+r $XAUTH
 fi
 
-sufix=$1
-container=$2
-dir=$PWD
-
-echo  $sufix
-echo  $dir
-
 safe_container_creation() {
-    if docker container list | grep -i ubuntu2004-ros-noetic-container-$container; then
+    if docker container list | grep -i pipeline-ros-noetic-ubuntu-20-02-ws; then
         echo Container already exists
     else
         docker run -d -i --rm \
             -v /tmp/.X11-unix:/tmp/.X11-unix:rw --privileged \
             --network="host" \
             --volume="$XAUTH:$XAUTH:rw" \
-            --volume="$dir:/home/user/$container/" \
+            --volume="$PWD:/home/user/ws/" \
             --volume="/home/$USER/.ssh/:/home/user/.ssh/" \
-	        --volume="/dev:/dev" \
-            --name ubuntu2004-ros-noetic-container-$container \
-            pipeline-ubuntu2004-ros-noetic-gazebo-$sufix /bin/bash
+            --name pipeline-ros-noetic-ubuntu-20-02-ws \
+            ghvs/pipeline-ros-noetic-ubuntu-20-02 /bin/bash
     fi
 }
 
@@ -42,5 +34,5 @@ docker exec \
 --env="DISPLAY=$DISPLAY" \
 --env="QT_X11_NO_MITSHM=1" \
 --env="XAUTHORITY=$XAUTH" \
---workdir /home/user/$container \
--it ubuntu2004-ros-noetic-container-$container /bin/bash
+--workdir /home/user/ws \
+-it pipeline-ros-noetic-ubuntu-20-02-ws /bin/bash
