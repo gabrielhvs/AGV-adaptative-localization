@@ -5,30 +5,22 @@ import rospy
 
 from geometry_msgs.msg import Twist
 
+error_last = 0.0
+
 class MotionPlanner:
     def __init__(self):
         self.velocity = Twist()
         self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size=1)
 
-    def move(self, dir):
-        if dir == 0:
-            self.velocity.linear.x = 0
-            self.velocity.angular.z = 0
-            rospy.loginfo('Lin. vel. = 0')
+    def move(self, error):
+        print(error)
+        error = 0.01 * error #scale to m
+        self.velocity.angular.z = error * -0.1
 
-        if dir == 1:
-            self.velocity.linear.x = 0.2
-            self.velocity.angular.z = 0
-            rospy.loginfo('Lin. vel. = 0.2')
-
-        if dir == 2:
-            self.velocity.linear.x = .075
-            self.velocity.angular.z = .15
-            rospy.loginfo('Lin. vel. = 0.1 - Ang. vel. = 0.15')
-
-        if dir == 3:
-            self.velocity.linear.x = .075
-            self.velocity.angular.z = -.15
-            rospy.loginfo('Lin. vel. = 0.1 - Ang. vel. = -0.15')
+        vel_lin = 0.8
+        if(error != 0):
+           vel_lin =  0.1 * (1/abs(error))
+        if(vel_lin > 0.8 ): vel_lin = 0.8
+        self.velocity.linear.x = vel_lin
 
         self.publisher.publish(self.velocity)

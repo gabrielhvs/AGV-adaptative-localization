@@ -71,7 +71,11 @@ class LineDetector:
         if line_color == 'black':
             lower = np.array([0, 0, 0])
             upper = np.array([179, 20, 155])
-        
+
+        if line_color == 'yellow':
+            lower = np.array([20, 100, 100])
+            upper = np.array([30, 255, 255])
+
         mask = cv2.inRange(self.blurred_hsv, lower, upper)
 
         search_y = int(self.height*2/5)
@@ -103,14 +107,9 @@ class LineDetector:
             self.video_data.append(self.image)
 
             rospy.logwarn('No line found')
-            return 0
-        
-        if cx > self.width/2 - tol and cx < self.width/2 + tol:
-            return 1
-        if cx < self.width/2 - tol:
-            return 2
-        if cx > self.width/2 + tol:
-            return 3
+            return 100
+
+        return (cx - self.width/2)
 
 if __name__ == '__main__':
     image_processor = LineDetector()
