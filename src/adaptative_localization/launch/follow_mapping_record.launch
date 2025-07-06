@@ -1,0 +1,45 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg name="rec" default="false"/>
+    <arg name="x" default="3.0"/><!--line_comp: 3--><!--maze: 1--><!--square: 4-->
+    <arg name="y" default="1.0"/><!--line_comp: 1--><!--maze: 16--><!--square: 3-->
+    <arg name="z" default="0"/>  
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
+    <arg name="world" default="line_comp_warehouse"/>
+
+    <!-- Start Gmapping node -->
+    <node name="gmapping" pkg="gmapping" type="slam_gmapping">
+        <param name="base_frame" value="base_link"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="scan_frame" value="scan_link"/>
+        <remap from="scan" to="laser"/>
+    </node>
+
+    <!-- Record rosbag -->
+    <node name="rosbag_recorder" pkg="rosbag" type="record" output="screen" args="-O $(arg world)_data.bag /tf /tf_static /camera/image_raw /camera/camera_info" />
+
+    <!-- Simulation world and node -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
+        <arg name = "world_name" value =  "$(find adaptative_localization)/world/$(arg world).world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false[]"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find agv_description)/urdf/agv.urdf.xacro'" />	
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description" if="$(arg sim)">
+    </node>
+
+    <!-- Line follower node -->
+    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>
+
+</launch>
