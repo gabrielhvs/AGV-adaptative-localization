@@ -4,7 +4,7 @@
     <param name="output" value="$(arg world_path)"/>
 
     <rosparam file="$(find adaptative_localization)/param_worlds/line_fail_warehouse.yaml" command="load"/>
-    <node name="generate_world" pkg="adaptative_localization" type="generate_world_offline" output="screen"/>
+    <node name="generate_line" pkg="adaptative_localization" type="generate_world_offline" output="screen"/>
 
     <!-- Atraso para garantir que o .world seja gerado -->
     <param name="wait_duration" value="5" />
