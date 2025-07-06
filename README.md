@@ -130,22 +130,12 @@ For this repository:
 
 After this to using the image created run this:
 ```
-./tools/open.sh [folder of Dockerfile] [work dir]
-```
-
-For this repository:
-```
-./tools/open.sh docker-base ws
+./tools/open.sh
 ```
 
 When execute this command, a iteractive terminal is open. If you needs close this using:
 ```
-./tools/stop.sh [work dir]
-```
-
-For this repository:
-```
-./tools/stop.sh ws
+./tools/stop.sh
 ```
 
 ### Step 2 — Building Ros Packages
@@ -224,6 +214,35 @@ The reference frame used is base_link.
 
 The EKF configuration file is located at:
 src/adaptative_localization/config/ekf.yaml
+
+#### Map and Record Virtual Line
+
+To map a enviroment and get a rosbag with the especific
+topics to create a virtual line using this:
+
+```
+roslaunch adaptative_localization follow_mapping_record.launch
+```
+
+In this launch have a implementation of:
+- record rosbag
+- simulation on gazebo
+- line follow
+
+#### Using Virtual Line
+
+To using a virtual line, map and amcl localization you can use this line command:
+
+```
+roslaunch adaptative_localization goal_pose_follow.launch
+```
+In this launch have a implementation of:
+- publish map
+- get localization amcl
+- publish waypoints
+- simulation gazebo
+- init rviz
+
 
 #### More detais about packages
 
