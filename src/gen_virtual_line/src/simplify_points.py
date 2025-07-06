@@ -11,6 +11,11 @@ def simplify(data):
 
     #RDP fitting - Simplify to 90° corners
     last_axe = 0
+
+    for i in range(1, len(simplified)):
+        simplified[i, 0] = round(simplified[i, 0])
+        simplified[i, 1] = round(simplified[i, 1])
+
     for i in range(1, len(simplified)):
         vec = simplified[i] - simplified[i-1]
         angle = np.degrees(np.arctan2(vec[1], vec[0])) % 360
@@ -28,9 +33,9 @@ def simplify(data):
         angle = np.deg2rad((angle - axe_close))
 
         if(last_axe == 0 or last_axe == 360) or (last_axe == 180) :
-            simplified[i-1, 0] = simplified[i, 0]
+            simplified[i-1, 0] = round(simplified[i, 0])
         else:
-            simplified[i-1, 1] = simplified[i, 1]
+            simplified[i-1, 1] = round(simplified[i, 1])
 
         last_axe = axe_close
 
@@ -57,22 +62,17 @@ def save_image(data, save_dir):
     import numpy as np
     simplified = data[0]
     path_points = data[1]
-    pointsGT = data[2]
 
     fig, ax = plt.subplots()
 
-    #Ground Truth
-    points = np.array([[i[0], i[1]] for i in pointsGT])
-    ax.plot(points[:, 0], points[:, 1], 'g', linewidth=5, label="Ground Truth")
-
     #Simplificado
-    ax.plot(simplified[0, 0], simplified[0, 1], 'ro', markersize=15)
+    ax.plot(simplified[:, 0], simplified[:, 1], 'ro', markersize=15, label="RDP Aproximate")
 
     #Simplificado condensado
-    ax.plot(path_points[:, 0], path_points[:, 1], 'bo', markersize=10, label="RDP Aproximate")
+    ax.plot(path_points[:, 0], path_points[:, 1], 'bo', markersize=10, label="RDP Aproximate Interpolate")
 
     ax.legend()
-    ax.set_title("Path Virtual basing in RDP Aproximation", fontsize=24)
+    ax.set_title("Path Virtual basing in RDP Aproximation", fontsize=20)
     ax.grid()
     plt.axis("equal")
     ax.set_xlabel("x (m)", fontsize=18)
