@@ -3,55 +3,62 @@ import rosbag
 import sys
 from collections import defaultdict
 
-fraction = 0
-
 def remove_repeated_tf(input_bag, output_bag):
     print(f"Processando: {input_bag} → {output_bag}")
+
+    # Tópicos permitidos
+    allowed_topics = [
+        "/tf",
+        "/tf_static",
+        "/camera/image_raw",
+        "/camera/camera_info"
+    ]
 
     seen_timestamps = defaultdict(set)  # frame_id → set de timestamps
     i = 0
     fraction = 0
-    inpbag = rosbag.Bag(input_bag)
-    amountMsg = inpbag.get_message_count()
-    with rosbag.Bag(output_bag, 'w') as outbag:
-        for topic, msg, t in inpbag.read_messages():
-            i = i+1
-            fraction = progress_bar(fraction, i, amountMsg)
-            if topic in ["/tf", "/tf_static"]:
-                new_transforms = []
 
-                for transform in msg.transforms:
-                    frame = transform.child_frame_id
-                    stamp = transform.header.stamp.to_nsec()
+    with rosbag.Bag(input_bag, 'r') as inpbag:
+        amountMsg = inpbag.get_message_count()
 
-                    if stamp not in seen_timestamps[frame]:
-                        seen_timestamps[frame].add(stamp)
-                        new_transforms.append(transform)
-                    else:
-                        # TF duplicado encontrado e ignorado
-                        pass
+        with rosbag.Bag(output_bag, 'w') as outbag:
+            for topic, msg, t in inpbag.read_messages():
+                i += 1
+                fraction = progress_bar(fraction, i, amountMsg)
 
-                if new_transforms:
-                    msg.transforms[:] = new_transforms
+                if topic not in allowed_topics:
+                    continue  # Ignora tópicos não permitidos
+
+                if topic in ["/tf", "/tf_static"]:
+                    new_transforms = []
+
+                    for transform in msg.transforms:
+                        frame = transform.child_frame_id
+                        stamp = transform.header.stamp.to_nsec()
+
+                        if stamp not in seen_timestamps[frame]:
+                            seen_timestamps[frame].add(stamp)
+                            new_transforms.append(transform)
+
+                    if new_transforms:
+                        msg.transforms[:] = new_transforms
+                        outbag.write(topic, msg, t)
+                else:
                     outbag.write(topic, msg, t)
-            else:
-                outbag.write(topic, msg, t)
 
-    print("✔️  Bag filtrado com sucesso!")
-
+    print("\n✔️  Bag filtrado com sucesso!")
 
 def progress_bar(last_frac, current, total, bar_length=30):
-        fraction = 0
-        if(last_frac == 1.0):
-            print('✔️')
-            fraction = last_frac+1
-        elif(last_frac < 1.0):
-            fraction = float(current) / float(total)
-            filled_length = int(bar_length * fraction)
-            bar = '▓' * filled_length + '░' * (bar_length - filled_length)
-            percent = int(fraction * 100)
-            print(f'\r[{bar}] {percent}%', end='', flush=True)
-        return fraction
+    if total == 0:
+        return 1.0
+    fraction = float(current) / float(total)
+    if fraction > 1.0:
+        fraction = 1.0
+    filled_length = int(bar_length * fraction)
+    bar = '▓' * filled_length + '░' * (bar_length - filled_length)
+    percent = int(fraction * 100)
+    print(f'\r[{bar}] {percent}%', end='', flush=True)
+    return fraction
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
