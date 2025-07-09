@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirror.ufscar.br/ubuntu/|g' /etc/apt/sources.list
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,display
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get -y full-upgrade && apt-get install -y --no-install-recommends software-properties-common && add-apt-repository universe
