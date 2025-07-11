@@ -6,7 +6,7 @@
     <arg name="z" default="0"/>  
     <arg name="roll" default="0"/>
     <arg name="pitch" default="0"/>
-    <arg name="yaw" default="0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
+    <arg name="yaw" default="-0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
     <arg name="world" default="square_warehouse"/>
     <arg name="map_file" default="$(find adaptative_localization)/maps/$(arg world).yaml"/>
 
@@ -40,7 +40,7 @@
         <param name="laser_likelihood_max_dist" value="2.0"/>
         <param name="update_min_d" value="0.2"/>
         <param name="update_min_a" value="0.5"/>
-        <param name="odom_frame_id" value="odom_amcl"/>
+        <param name="odom_frame_id" value="odom"/>
         <param name="resample_interval" value="1"/>
         <param name="transform_tolerance" value="0.1"/>
         <param name="recovery_alpha_slow" value="0.0"/>
