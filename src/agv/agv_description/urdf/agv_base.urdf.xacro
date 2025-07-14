@@ -10,7 +10,7 @@
         <origin xyz="0 0 -0.1625" rpy=" 0 0 0"/>
         <geometry>
            <!--<mesh filename="package://agv_description/meshes/OTAv07_meshes/OTA-v0.7.stl" scale="0.001 0.001 0.001"/> -->
-          <box size="1.02 0.72 0.14"/>
+          <box size="1.02 0.72 0.40"/>
         </geometry>
       </visual>    
       
