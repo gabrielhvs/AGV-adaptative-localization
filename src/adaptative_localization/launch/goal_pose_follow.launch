@@ -15,12 +15,16 @@
         <param name="frame_id" value="map"/>
     </node>
 
+    <!-- Publish Waypoints -->
+    <node name="publish_waypoints" pkg="gen_virtual_line" type="publishing_waypoints.py" output="screen"
+            args=" $(find gen_virtual_line)/src/data_result/$(arg world)_data_filter_result.csv" />
+
     <!-- Localization-->
     <node pkg="amcl" type="amcl" name="amcl" output="screen">
         <remap from="scan" to="laser"/>
         <param name="odom_model_type" value="diff"/>
         <param name="odom_alpha5" value="0.1"/>
-        <param name="gui_publish_rate" value="10.0"/>
+        <param name="gui_publish_rate" value="100.0"/>
         <param name="laser_max_beams" value="30"/>
         <param name="min_particles" value="500"/>
         <param name="max_particles" value="5000"/>
@@ -38,8 +42,8 @@
         <param name="laser_lambda_short" value="0.1"/>
         <param name="laser_model_type" value="likelihood_field"/>
         <param name="laser_likelihood_max_dist" value="2.0"/>
-        <param name="update_min_d" value="0.2"/>
-        <param name="update_min_a" value="0.5"/>
+        <param name="update_min_d" value="0.01"/>
+        <param name="update_min_a" value="0.01"/>
         <param name="odom_frame_id" value="odom"/>
         <param name="resample_interval" value="1"/>
         <param name="transform_tolerance" value="0.1"/>
@@ -49,10 +53,6 @@
         <param name="initial_pose_y" value="$(arg y)"/>
         <param name="initial_pose_a" value="$(arg yaw)"/>
     </node>
-
-    <!-- Publish Waypoints -->
-    <node name="publish_waypoints" pkg="gen_virtual_line" type="publishing_waypoints.py" output="screen"
-            args=" $(find gen_virtual_line)/src/data_result/$(arg world)_data_filter_result.csv" />
 
     <!-- Simulation world and node -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
@@ -80,13 +80,13 @@
             args="-urdf -model autorace -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description" if="$(arg sim)">
     </node>
 
-    <!-- Publish  TF-->
-    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0 0.0 0 0 0  /map /odom 100" />
-
     <!-- Rviz -->
     <node type="rviz" name="rviz" pkg="rviz" required="true" args="-d $(find adaptative_localization)/rviz_config/view_config.rviz"/>
 
     <!-- Line follower node 
-    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>-->
-
+    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>
+-->
+    <node name="virtual_line_follower" pkg="virtual_line_follower" type="virtual_line_follower.py" output="screen">
+        <param name="online"     value="true"/>
+    </node>
 </launch>
