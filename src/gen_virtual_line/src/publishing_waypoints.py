@@ -2,6 +2,7 @@
 import rospy
 import csv
 import sys
+import math
 import numpy as np
 from geometry_msgs.msg import Pose, PoseArray, Quaternion, Point
 from visualization_msgs.msg import Marker, MarkerArray
@@ -43,10 +44,9 @@ def create_marker(index, pose):
 def publish_waypoints(file_path):
     rospy.init_node("waypoint_publisher")
 
-    pub_poses = rospy.Publisher("/waypoints/poses", PoseArray, queue_size=1, latch=True)
-    pub_markers = rospy.Publisher("/waypoints/markers", MarkerArray, queue_size=1, latch=True)
+    pub_poses = rospy.Publisher("/waypoints/poses", PoseArray, queue_size=10)
+    pub_markers = rospy.Publisher("/waypoints/markers", MarkerArray, queue_size=10)
 
-    rate = rospy.Rate(1)  # Publish once
     rospy.sleep(1.0)
 
     try:
@@ -55,26 +55,46 @@ def publish_waypoints(file_path):
         pose_array.header.frame_id = "map"
         marker_array = MarkerArray()
 
-        for i in range(len(waypoints) - 1):
+        for i in range(len(waypoints)):
             x, y = waypoints[i, 0], waypoints[i, 1]
-            import math
 
-            dx = waypoints[i + 1, 0] - x
-            dy = waypoints[i + 1, 1] - y
-            yaw =  math.atan2(dy, dx)  # em radianos
+            if waypoints.shape[1] >= 3:
+                yaw = waypoints[i, 2]
+            elif i < len(waypoints) - 1:
+                dx = waypoints[i + 1, 0] - x
+                dy = waypoints[i + 1, 1] - y
+                yaw = normalize_angle(math.atan2(dy, dx))
+            else:
+                yaw = 0.0
 
-            pose = create_pose(x, y, yaw)
-            pose_array.poses.append(pose)
-            marker = create_marker(i, pose)
-            marker_array.markers.append(marker)
+            if(dx != 0 or dy != 0):
+                pose = create_pose(x, y, yaw)
+                pose_array.poses.append(pose)
+                marker = create_marker(i, pose)
+                marker_array.markers.append(marker)
 
-        pub_poses.publish(pose_array)
-        pub_markers.publish(marker_array)
-        rospy.loginfo(f"✅ Published {len(waypoints)} waypoints.")
+        rospy.loginfo(f"✅ Loaded {len(pose_array.poses)} waypoints.")
+
+        rate = rospy.Rate(10)  # 10 Hz
+        while not rospy.is_shutdown():
+            pose_array.header.stamp = rospy.Time.now()
+            for m in marker_array.markers:
+                m.header.stamp = rospy.Time.now()
+
+            pub_poses.publish(pose_array)
+            pub_markers.publish(marker_array)
+            rate.sleep()
+
     except Exception as e:
         rospy.logerr(f"❌ Error reading or publishing waypoints: {e}")
 
-    rospy.spin()
+
+def normalize_angle(angle):
+    while angle > math.pi:
+        angle -= 2 * math.pi
+    while angle < -math.pi:
+        angle += 2 * math.pi
+    return angle
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
