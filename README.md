@@ -76,9 +76,11 @@ This repository implements localization strategies for an AGV in an environment,
 -->
 
 
-<div align="center">
-    <img alt="demo" src="./demo/amcl_demos.gif">
-</div>
+
+| <img src="./demo/virtual_line_demo.gif" width="600px"> | <img src="./demo/visual_line_demo.gif" width="600px"> |
+|:--:|:--:|
+| **Figura 1:** Seguidor de linha virtual | **Figura 2:** Seguidor de linha visual |
+
 
 ## Table of Contents<!-- Optional -->
 <!-- 
