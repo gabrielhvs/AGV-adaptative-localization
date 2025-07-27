@@ -27,5 +27,7 @@ jobs:
         run: |
           catkin config --extend /opt/ros/noetic
           catkin config --cmake-args -Dcatkin_DIR=/opt/ros/noetic/share/catkin/cmake
+          apt update && apt install -y \
+          python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
           roscd catkin
           bash tools/run_ws.sh
