@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Configure Catkin workspace
+        run: |
+          cd src \
+          catkin init \
+          catkin config --merge-devel \
+
       - name: Build workspace
         run: |
           bash tools/run_ws.sh
