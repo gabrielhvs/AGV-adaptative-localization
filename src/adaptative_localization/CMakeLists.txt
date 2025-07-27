@@ -18,7 +18,6 @@ find_package(gazebo REQUIRED)
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs gazebo_msgs
 )
 
@@ -27,7 +26,6 @@ catkin_package(
 ###########
 
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
 )
