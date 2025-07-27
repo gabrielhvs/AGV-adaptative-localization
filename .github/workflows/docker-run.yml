@@ -17,19 +17,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt update && apt install -y \
-            ros-noetic-catkin \
-            python3-catkin-tools \
-            python3-vcstool
-
-      - name: Configure Catkin workspace
-        run: |
-          ls 
-          pwd 
-          cd src 
-          catkin init 
-          catkin config --merge-devel 
-          catkin config --extend /opt/ros/noetic
+          source /opt/ros/noetic/setup.bash
 
       - name: Build workspace
         run: |
