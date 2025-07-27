@@ -21,7 +21,6 @@ jobs:
           source /opt/ros/noetic/setup.bash
           apt update && apt install -y \
           python3-rosdep
-          rosdep init
           rosdep update
 
       - name: Build workspace
