@@ -24,6 +24,8 @@ jobs:
 
       - name: Configure Catkin workspace
         run: |
+          ls \
+          pwd \
           cd src \
           catkin init \
           catkin config --merge-devel \
