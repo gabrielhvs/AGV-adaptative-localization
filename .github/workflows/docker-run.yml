@@ -15,8 +15,5 @@ jobs:
 
       - name: Run script inside Docker container
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            ghvs/pipeline-ros-noetic-ubuntu-20-02 \
-            bash tools/run_ws.sh
+          bash tools/open.sh \
+          bash tools/run_ws.sh
