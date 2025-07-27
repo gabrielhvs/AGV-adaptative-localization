@@ -24,11 +24,11 @@ jobs:
 
       - name: Configure Catkin workspace
         run: |
-          ls \
-          pwd \
-          cd src \
-          catkin init \
-          catkin config --merge-devel \
+          ls 
+          pwd 
+          cd src 
+          catkin init 
+          catkin config --merge-devel 
           catkin config --extend /opt/ros/noetic
 
       - name: Build workspace
