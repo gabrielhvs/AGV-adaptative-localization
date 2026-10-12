@@ -1,13 +1,13 @@
 <launch>
     <arg name="sim" default="true"/>
     <arg name="rec" default="false"/>
-    <arg name="x" default="4.0"/><!--line_comp: 3--><!--maze: 1--><!--square: 4-->
-    <arg name="y" default="3.0"/><!--line_comp: 1--><!--maze: 16--><!--square: 3-->
+    <arg name="x" default="3.0"/><!--line_comp: 3--><!--maze: 1--><!--square: 4-->
+    <arg name="y" default="1.0"/><!--line_comp: 1--><!--maze: 16--><!--square: 3-->
     <arg name="z" default="0"/>  
     <arg name="roll" default="0"/>
     <arg name="pitch" default="0"/>
-    <arg name="yaw" default="-0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
-    <arg name="world" default="square_warehouse"/>
+    <arg name="yaw" default="0"/><!--line_comp: 0--><!--maze: -1.57--><!--square: 0-->
+    <arg name="world" default="line_comp_warehouse"/><!--line_comp: line_comp_warehouse--><!--maze: maze_warehouse--><!--square: square_warehouse-->
     <arg name="map_file" default="$(find adaptative_localization)/maps/$(arg world).yaml"/>
 
     <!-- Mapping-->
@@ -17,7 +17,7 @@
 
     <!-- Publish Waypoints -->
     <node name="publish_waypoints" pkg="gen_virtual_line" type="publishing_waypoints.py" output="screen"
-            args=" $(find gen_virtual_line)/src/data_result/$(arg world)_data_filter_result.csv" />
+            args=" $(find gen_virtual_line)/src/data_result/line_comp_warehouse_data_filter_result.csv" />
 
     <!-- Localization-->
     <node pkg="amcl" type="amcl" name="amcl" output="screen">
@@ -56,11 +56,11 @@
 
     <!-- Simulation world and node -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg sim)">
-        <arg name = "world_name" value =  "$(find adaptative_localization)/world/$(arg world).world"/>
+        <arg name = "world_name" value =  "$(find adaptative_localization)/world/line_fail_warehouse.world"/>
         <arg name="paused" value="false"/>
         <arg name="use_sim_time" value="true"/>
-        <arg name="gui" value="false"/> <!--  <arg name="gui" value="true"/> to open gazebo -->
-        <arg name="headless" value="true"/> <!--  <arg name="headless" value="false"/> to open gazebo -->
+        <arg name="gui" value="true"/> <!--  <arg name="gui" value="true"/> to open gazebo -->
+        <arg name="headless" value="false"/> <!--  <arg name="headless" value="false"/> to open gazebo -->
         <arg name="debug" value="false"/>
     </include>
 
@@ -83,10 +83,11 @@
     <!-- Rviz -->
     <node type="rviz" name="rviz" pkg="rviz" required="true" args="-d $(find adaptative_localization)/rviz_config/view_config.rviz"/>
 
-    <!-- Line follower node 
-    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen"></node>
--->
-    <node name="virtual_line_follower" pkg="virtual_line_follower" type="virtual_line_follower.py" output="screen">
+    <!-- Line follower node-->
+    <node pkg="robot_line_follower" name="robot_line_follower" type="follower.py" cwd="node" output="screen" required="true"></node>
+    
+    <!--
+     <node name="virtual_line_follower" pkg="virtual_line_follower" type="virtual_line_follower.py" output="screen" required="true">
         <param name="online"     value="true"/>
-    </node>
+    </node>-->
 </launch>

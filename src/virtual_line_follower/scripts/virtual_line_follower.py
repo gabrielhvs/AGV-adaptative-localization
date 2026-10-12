@@ -4,43 +4,17 @@ import yaml
 import math
 import os
 import sys
+import csv
+import time
+import statistics
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseWithCovarianceStamped, PoseArray
 from tf.transformations import euler_from_quaternion
 
-class PIDController:
-    def __init__(self, Kp, Ki, Kd):
-        self.Kp = Kp
-        self.Ki = Ki
-        self.Kd = Kd
-        self.previous_error = 0
-        self.integral = 0
-
-    def compute(self, error, dt = 0.01):
-            
-            if(dt == 0): dt = 0.01
-
-            # Proportional term
-            P_out = self.Kp * error
-
-            # Integral term
-            self.integral += error * dt
-            I_out = self.Ki * self.integral
-
-            # Derivative term
-            derivative = (error - self.previous_error) / dt
-            D_out = self.Kd * derivative
-
-            # Compute total output
-            output = P_out + I_out + D_out
-
-            # Update previous error
-            self.previous_error = error
-
-            return output
-
+from PID_controller.motion import PIDController
 class VirtualLineFollower:
     def __init__(self):
+
         rospy.init_node('virtual_line_follower')
 
         online = rospy.get_param('~online', '')
@@ -48,21 +22,15 @@ class VirtualLineFollower:
         if(online):
             rospy.Subscriber("/waypoints/poses", PoseArray, self.pose_array_callback, queue_size=1)
         else:
-            # Load line points from YAML
             self.load_line_points()
 
-        # Publisher to cmd_vel
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-
-        # Subscriber to AMCL pose
         rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
 
-        # Robot current pose
         self.robot_x = None
         self.robot_y = None
         self.robot_yaw = None
 
-        # Waypoint index
         self.current_index = 0
         self.line_points = []
 
@@ -71,6 +39,27 @@ class VirtualLineFollower:
         self.linear_speed = 0.4
         self.angular_speed_gain = 1.5
         self.max_angular_speed = 0.4
+        self.girando_na_quina = False  # NOVA VARIÁVEL DE ESTADO
+
+        ### CSV logs
+        self.distance_errors = []
+        self.heading_errors = []
+
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        log_dir = os.path.join(script_dir,  "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        metri_dir = os.path.join(script_dir,  "metrics")
+        os.makedirs(metri_dir, exist_ok=True)
+        self.log_path = os.path.join(log_dir, str(time.time()) + "_log.csv")
+        self.metrics_path = os.path.join(metri_dir, str(time.time()) + "_metrics.csv")
+
+        self.start_time = time.time()
+        self.log_file = open(self.log_path, 'w', newline='')
+        self.log_writer = csv.writer(self.log_file)
+        self.log_writer.writerow([
+            "timestamp", "goal_x", "goal_y", "robot_x", "robot_y", "linear_error", "angular_error"
+        ])
 
         rospy.loginfo("Virtual Line Follower Node Initialized")
         rospy.spin()
@@ -81,7 +70,6 @@ class VirtualLineFollower:
             rospy.logerr("Parameter line_path not set")
             rospy.signal_shutdown("Parameter line_path not set")
             return
-
         try:
             with open(path, 'r') as file:
                 data = yaml.safe_load(file)
@@ -93,36 +81,29 @@ class VirtualLineFollower:
 
     def pose_array_callback(self, msg):
         points = []
-        # Example: Print positions
-        for i, pose in enumerate(msg.poses):
-            _,_,yaw = euler_from_quaternion([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
+        for pose in msg.poses:
+            _, _, yaw = euler_from_quaternion([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
             points.append([pose.position.x, pose.position.y, yaw])
-
-        if (len(self.line_points) == 0):
-            rospy.loginfo("Control loop")
+        if len(self.line_points) == 0:
             self.line_points = points
             self.control_loop()
 
     def pose_callback(self, msg):
-        # Get current robot position
         self.robot_x = msg.pose.pose.position.x
         self.robot_y = msg.pose.pose.position.y
-
-        # Convert quaternion to yaw (heading)
         orientation_q = msg.pose.pose.orientation
         siny_cosp = 2 * (orientation_q.w * orientation_q.z + orientation_q.x * orientation_q.y)
         cosy_cosp = 1 - 2 * (orientation_q.y * orientation_q.y + orientation_q.z * orientation_q.z)
         self.robot_yaw = math.atan2(siny_cosp, cosy_cosp)
 
     def control_loop(self):
-
-        angle_control = PIDController(1.0, 0, 0)
-        linear_control = PIDController(1.0, 0, 0)
-        rate = rospy.Rate(10)  # 10 Hz
+        self.last_time = None # ADICIONE ISTO para rastrear o tempo anterior
+        angle_control = PIDController(0.05, 0.0, 0.4) 
+        rate = rospy.Rate(100)
+        step = False
 
         while not rospy.is_shutdown():
             if self.robot_x is None or self.robot_y is None or self.robot_yaw is None:
-                rospy.logwarn("Waiting for robot pose...")
                 rate.sleep()
                 continue
 
@@ -131,35 +112,73 @@ class VirtualLineFollower:
                 self.send_velocity(0, 0)
                 break
 
+            # 1. Calcule o intervalo de tempo (dt) real
+            current_time = rospy.Time.now().to_sec()
+            
+            if self.last_time is None:
+                dt = 0.033  # Valor seguro para o primeiro ciclo (assumindo ~30Hz)
+            else:
+                dt = current_time - self.last_time
+                
+            self.last_time = current_time # Salva o tempo para o ciclo seguinte
+
             goal_x, goal_y, goal_yaw = self.line_points[self.current_index]
 
-            # Compute distance and angle to goal
             dx = goal_x - self.robot_x
             dy = goal_y - self.robot_y
             distance = math.hypot(dx, dy)
             angle_to_goal = math.atan2(dy, dx)
             angle_error = self.normalize_angle(angle_to_goal - self.robot_yaw)
-
             final_yaw_error = self.normalize_angle(goal_yaw - self.robot_yaw)
 
-            if distance > 0.05:
-                linear = linear_control.compute(distance)
-                angular = angle_control.compute(angle_error)
-            elif final_yaw_error < 0.05:
+            # Log erros
+            self.distance_errors.append(distance)
+            self.heading_errors.append(angle_error)
+
+            # Log CSV
+            self.log_writer.writerow([
+                time.time(), goal_x, goal_y, self.robot_x, self.robot_y, distance, angle_error
+            ])
+
+            forceBreak = False
+
+            if distance > 0.11 and not(step):
+                angular = angle_error
+            elif abs(final_yaw_error) < 0.05:
                 rospy.loginfo(f"Reached waypoint {self.current_index + 1}")
                 self.current_index += 1
+                step = False
                 continue
             else:
-                linear = 0.0
-                angular = 1 * final_yaw_error
+                forceBreak = True
+                angular = final_yaw_error
+                step = True
 
-            angular = max(min(angular, self.max_angular_speed), -self.max_angular_speed)
 
-            rospy.loginfo(f"LinearVel: {linear} | AngVel: {angular} | error: {angle_error}")
-
-            self.send_velocity(linear, angular)
+            rospy.loginfo(f"Error Ativo {angular:.2f} | Error Yaw {final_yaw_error:.2f} | Dist {distance:.2f} | Estado Giro: {self.girando_na_quina}")
+            
+            # Passa o erro selecionado para o controlador
+            angle_control.move(angular, dt, forceBreak)
 
             rate.sleep()
+
+        ### Fim da missão: salvar métricas
+        self.save_metrics()
+        rospy.signal_shutdown('fim')
+
+    def save_metrics(self):
+        total_time = time.time() - self.start_time
+        mean_error = sum(self.distance_errors) / len(self.distance_errors) if self.distance_errors else 0.0
+        std_dev_dist = statistics.stdev(self.distance_errors) if len(self.distance_errors) > 1 else 0.0
+        std_dev_heading = statistics.stdev(self.heading_errors) if len(self.heading_errors) > 1 else 0.0
+
+        with open(self.metrics_path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["total_time", "mean_linear_error", "std_dev_distance", "std_dev_heading"])
+            writer.writerow([total_time, mean_error, std_dev_dist, std_dev_heading])
+
+        rospy.loginfo(f"Métricas salvas em: {self.metrics_path}")
+        self.log_file.close()
 
     def send_velocity(self, linear, angular):
         cmd = Twist()

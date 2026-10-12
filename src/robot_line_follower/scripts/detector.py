@@ -38,7 +38,6 @@ class LineDetector:
         self.height, self.width, _ = self.image.shape
 
     def get_direction(self, message=None, line_color='red', tol=10):
-        print("get_direction")
         '''
         Given an image message, it returns the direction the robot must take in order to follow the line.
         It calculates the direction mainly based on the color of the line.
@@ -93,7 +92,6 @@ class LineDetector:
 
             self.detection = self.bridge.cv2_to_imgmsg(self.image, encoding='bgr8')
             self.publisher.publish(self.detection)
-            print("self.publisher.publish(self.detection)")
 
             self.video_data.append(self.image)
 
@@ -102,12 +100,11 @@ class LineDetector:
             
             self.detection = self.bridge.cv2_to_imgmsg(self.image, encoding='bgr8')
             self.publisher.publish(self.detection)
-            print("self.publisher.publish(self.detection)2")
 
             self.video_data.append(self.image)
 
             rospy.logwarn('No line found')
-            return 100
+            return -1000
 
         return (cx - self.width/2)
 

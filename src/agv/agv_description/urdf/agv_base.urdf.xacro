@@ -121,14 +121,14 @@
     <joint name="zed_camera_joint" type="fixed">
       <parent link="base_link"/>
       <child link="zed_camera"/>
-            <origin xyz="0.90 0 0.175" rpy="0 1.57 0" />
+            <origin xyz="0.10 0 -0.01" rpy="0 1.57 0" />
     </joint>
 
     <gazebo reference="zed_camera">
       <sensor type="camera" name="camera">
         <update_rate>100.0</update_rate>
         <camera name="head">
-          <horizontal_fov>1.3962634</horizontal_fov>
+          <horizontal_fov>2.0</horizontal_fov>
           <image>
             <width>640</width>
             <height>480</height>

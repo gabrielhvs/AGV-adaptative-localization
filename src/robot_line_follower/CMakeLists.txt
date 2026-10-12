@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   message_generation
+  PID_controller
 )
 
 ## Generate added messages and services with any dependencies listed here
