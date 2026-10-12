@@ -13,9 +13,10 @@ CMakeUserPresets.json
 .catkin_tools
 build
 devel
-logs
+logs/
 *.log
 OTA-v0.7.stl
 *_deps*
 *__pycache__*
 *.bag
+*metrics*
